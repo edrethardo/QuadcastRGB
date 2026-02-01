@@ -51,6 +51,9 @@ static void write_gradient(byte_t **da, int start_col, int end_col,
 /* Wave */
 static void sequence_wave(int *color, int spd, int group, byte_t *da);
 static void wave_array_shift(int *color);
+static void sequence_reverse_wave(int *color, int spd, int group, byte_t *da);
+static void sequence_opposite_wave(int *color, int spd, int group, byte_t *da);
+static void wave_array_shift_right(int *color);
 /* Lightning & Pulse */
 static unsigned int count_lightning_data(struct colscheme *colsch);
 static void sequence_lightning(const int *color, int spd, int group,
@@ -114,7 +117,9 @@ static int count_data(struct colscheme *colsch)
         return 1;
     } else if(strequ(colsch->mode, "blink")) {
         return count_blink_data(colsch);
-    } else if(strequ(colsch->mode, "cycle") || strequ(colsch->mode, "wave")) {
+    } else if(strequ(colsch->mode, "cycle") || strequ(colsch->mode, "wave") ||
+              strequ(colsch->mode, "reverse-wave") ||
+              strequ(colsch->mode, "opposite-wave")) {
         return count_cycle_data(colsch);
     } else if(strequ(colsch->mode, "lightning") ||
               strequ(colsch->mode, "pulse")) {
@@ -140,13 +145,19 @@ static unsigned int count_blink_data(struct colscheme *colsch)
 
 static unsigned int count_cycle_data(struct colscheme *colsch)
 {
-    unsigned int size;
+    unsigned int size, tr_size, color_cnt;
+    
+    color_cnt = colarr_len(colsch->colors);
     /* The size of one gradient: */
-    size = SPEED_RANGE(MIN_CYCL_TR, MAX_CYCL_TR, colsch->spd);
-    /* The size of all colpairs: */
-    size *= colarr_len(colsch->colors); 
-    if(size > MAX_COLPAIR_COUNT) /* case of overflow */
-        return MAX_PCT_COUNT;
+    tr_size = SPEED_RANGE(MIN_CYCL_TR, MAX_CYCL_TR, colsch->spd);
+    
+    if(tr_size * color_cnt > MAX_COLPAIR_COUNT) {
+        /* Recalculate tr_size to fit in MAX_COLPAIR_COUNT */
+        tr_size = MIN_CYCL_TR +
+               (MAX_COLPAIR_COUNT/color_cnt - MIN_CYCL_TR)*(100 - colsch->spd)/100;
+    }
+
+    size = tr_size * color_cnt;
     return DIV_CEIL(size, COLPAIR_PER_PCT);
 }
 
@@ -192,6 +203,10 @@ static void fill_data(struct colscheme *colsch, byte_t *da, int pckcnt,
         sequence_cycle(colsch->colors, colsch->spd, da);
     } else if(strequ(colsch->mode, "wave")) {
         sequence_wave(colsch->colors, colsch->spd, group, da);
+    } else if(strequ(colsch->mode, "reverse-wave")) {
+        sequence_reverse_wave(colsch->colors, colsch->spd, group, da);
+    } else if(strequ(colsch->mode, "opposite-wave")) {
+        sequence_opposite_wave(colsch->colors, colsch->spd, group, da);
     } else if(strequ(colsch->mode, "lightning")) {
         sequence_lightning(colsch->colors, colsch->spd, group, 0, da);
     } else if(strequ(colsch->mode, "pulse")) {
@@ -347,6 +362,30 @@ static void wave_array_shift(int *color)
     for(tmp = color; *(tmp+1) != nocolor; tmp++)
         *(tmp) = *(tmp+1);
     *(tmp) = first;
+}
+
+static void sequence_reverse_wave(int *color, int spd, int group, byte_t *da)
+{
+    if(group == upper)
+        wave_array_shift(color);
+    sequence_cycle(color, spd, da);
+}
+
+static void sequence_opposite_wave(int *color, int spd, int group, byte_t *da)
+{
+    if(group == lower)
+        wave_array_shift_right(color);
+    sequence_cycle(color, spd, da);
+}
+
+static void wave_array_shift_right(int *color)
+{
+    int *tmp, last;
+    for(tmp = color; *(tmp+1) != nocolor; tmp++);
+    last = *tmp;
+    for(; tmp > color; tmp--)
+        *tmp = *(tmp-1);
+    *color = last;
 }
 
 static void sequence_lightning(const int *color, int spd, int group,

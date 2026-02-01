@@ -48,20 +48,21 @@
 /* Blink random */
 #define MAX_SPD 101
 #define MAX_DLY 100
-#define RAND_COL_SEG_MAX 51
-#define RAND_DLY_SEG_MAX 51
-#define RAND_COL_SEG_MIN 5
-#define RAND_DLY_SEG_MIN 2
+#define RAND_COL_SEG_MAX 140
+#define RAND_DLY_SEG_MAX 140
+#define RAND_COL_SEG_MIN 14
+#define RAND_DLY_SEG_MIN 6
 /* Cycle */
-#define MIN_CYCL_TR 12
-#define MAX_CYCL_TR 128
+#define MIN_CYCL_TR 4
+#define MAX_CYCL_TR 480
+
 /* Lightning */
-#define MIN_LGHT_BL 1
-#define MAX_LGHT_BL 9
-#define MIN_LGHT_UP 3
-#define MAX_LGHT_UP 10
-#define MIN_LGHT_DOWN 21
-#define MAX_LGHT_DOWN 131
+#define MIN_LGHT_BL 3
+#define MAX_LGHT_BL 25
+#define MIN_LGHT_UP 8
+#define MAX_LGHT_UP 28
+#define MIN_LGHT_DOWN 58
+#define MAX_LGHT_DOWN 360
 
 /* Messages */
 #define NOSUPPORT_MSG _("The mode not supported yet.\n")

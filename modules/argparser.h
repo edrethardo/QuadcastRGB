@@ -37,7 +37,7 @@
 
 /* Constants */
 #define COLORS_CNT 11
-#define MODES_CNT 7
+#define MODES_CNT 9
 #define RAINBOW_CNT 10
 #define MAX_BR_SPD_DLY 100
 #define SPD_DEFAULT 81
@@ -56,13 +56,15 @@ enum diode_group { all, upper, lower }; /* state values */
 /* Messages */
 #define HELP_MESSAGE _("Usage: quadcastrgb [-h] [-v] [-a|-u|-l] [-b bright] "\
                      "[-s speed] mode [COLORS]...\nAvailable modes: "\
-                     "solid, blink, cycle, lightning, wave. Colors are hex "\
+                     "solid, blink, cycle, lightning, wave, reverse-wave, "\
+                     "opposite-wave. Colors are hex "\
                      "numbers.\nSee 'man quadcastrgb' for details.\n")
 #define BADARG_MSG   _("Unknown option: %s\n")
 #define NOPARAM_LONG_MSG _("%s: no parameter(s) specified\n")
 #define NOPARAM_SHORT_MSG _("%s: no parameter or it isn't a natural number\n")
 #define BS_BADPARAM_MSG _("%s: the parameter must be an integer 0-100\n")
-#define NOMODE_MSG _("No mode specified (solid|blink|cycle|lightning|wave)\n")
+#define NOMODE_MSG _("No mode specified "\
+                     "(solid|blink|cycle|lightning|wave|reverse-wave|opposite-wave)\n")
 
 /* Structs */
 struct colscheme {

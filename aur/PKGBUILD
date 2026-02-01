@@ -1,6 +1,6 @@
 # Maintainer: Ors1mer <ors1mer_dev [[at]] proton.me>
 pkgname='quadcastrgb'
-pkgver=1.0.2
+pkgver=2.0.0
 pkgrel=1
 pkgdesc="set RGB mode for the microphone HyperX Quadcast S"
 arch=('x86_64')

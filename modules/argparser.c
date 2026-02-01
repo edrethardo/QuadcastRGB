@@ -28,7 +28,7 @@
 /* Static declarations */
 static void set_arg(const char ***arg_pp, const char **argv_end,
                     struct colschemes *cs, int *state, int *verbose);
-static void set_br_spd_dly(const char **arg_p, const char **argv_end,
+static int set_br_spd_dly(const char **arg_p, const char **argv_end,
                            int state, struct colschemes *cs);
 static void set_mode(const char ***arg_pp, const char **argv_end,
                      int state, struct colschemes *cs);
@@ -58,8 +58,10 @@ WRITE_PARAM(const char *, write_str_param)
 
 /* Const arrays */
 const char *modes[MODES_CNT] = {
-    "solid", "blink", "cycle", "wave", "lightning", "pulse", "visualizer"
+    "solid", "blink", "cycle", "wave", "lightning", "pulse", "visualizer",
+    "reverse-wave", "opposite-wave"
 };
+
 static const int rainbow[RAINBOW_CNT] = {
     0xff0000, 0xff009e, 0xcd00ff,
     0x2b00ff, 0x0068ff, 0x00ffff,
@@ -113,8 +115,8 @@ static void set_arg(const char ***arg_pp, const char **argv_end,
         *state = lower;
     } else if(strequ(**arg_pp, "-b") || strequ(**arg_pp, "-s") ||
                                         strequ(**arg_pp, "-d")) {
-        set_br_spd_dly(*arg_pp, argv_end, *state, cs);
-        (*arg_pp)++; /* skip option's parameter */
+        if(set_br_spd_dly(*arg_pp, argv_end, *state, cs))
+            (*arg_pp)++; /* skip option's parameter */
     } else if(is_mode(**arg_pp)) {
         set_mode(arg_pp, argv_end, *state, cs);
         set_colors(arg_pp, argv_end, *state, cs);
@@ -134,13 +136,12 @@ static int is_mode(const char *str)
     return 0;
 }
 
-static void set_br_spd_dly(const char **arg_p, const char **argv_end,
+static int set_br_spd_dly(const char **arg_p, const char **argv_end,
                            int state, struct colschemes *cs)
 {
     short num;
     if(no_opt_param(arg_p, argv_end)) {
-        fprintf(stderr, NOPARAM_SHORT_MSG, *arg_p);
-        free(cs); exit(argerr);
+        return 0;
     }
     num = atoi(*(arg_p+1));
     if(num > MAX_BR_SPD_DLY) {
@@ -154,6 +155,7 @@ static void set_br_spd_dly(const char **arg_p, const char **argv_end,
     } else if(strequ(*arg_p, "-d")) { /* delay */
         write_int_param(&(cs->upper.dly), &(cs->lower.dly), num, state);
     }
+    return 1;
 }
 
 static int is_number(const char *str)
@@ -213,7 +215,9 @@ static void set_colors(const char ***arg_pp, const char **argv_end,
 static void write_default_cols(struct colschemes *cs, int state)
 {
     const char *md = (state == upper) ? cs->upper.mode : cs->lower.mode;
-    if(strequ(md, modes[2]) || strequ(md, modes[3])) { /* cycle or wave */
+    if(strequ(md, modes[2]) || strequ(md, modes[3]) ||
+       strequ(md, modes[7]) || strequ(md, modes[8])) {
+        /* cycle, wave, reverse-wave or opposite-wave */
         int i;
         for(i = 0; i < RAINBOW_CNT; i++) {
             write_int_param(&(cs->upper.colors[i]), &(cs->lower.colors[i]),

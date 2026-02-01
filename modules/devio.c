@@ -469,7 +469,7 @@ static void display_data_arr(libusb_device_handle *handle,
         print_packet(packet, "Data:");
         #endif
         colcommand += 2*BYTE_STEP;
-        usleep(1000*55);
+        usleep(1000*20);
     }
     free(packet);
 }
