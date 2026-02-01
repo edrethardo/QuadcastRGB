@@ -64,10 +64,12 @@ debpkg: quadcastrgb
 	mkdir -p deb/$(DEBNAME)
 	mkdir -p deb/$(DEBNAME)/DEBIAN \
 		 deb/$(DEBNAME)/usr/bin \
-		 deb/$(DEBNAME)/usr/share/man/man1
+		 deb/$(DEBNAME)/usr/share/man/man1 \
+		 deb/$(DEBNAME)/lib/udev/rules.d
 	cp deb/control deb/$(DEBNAME)/DEBIAN/control
 	cp $(BINPATH) deb/$(DEBNAME)/usr/bin/quadcastrgb
 	cp $(MANPATH).gz deb/$(DEBNAME)/usr/share/man/man1
+	cp deb/99-quadcastrgb.rules deb/$(DEBNAME)/lib/udev/rules.d/
 	dpkg --build deb/$(DEBNAME)
 
 rpmpkg: main.c $(SRCMODULES) man/quadcastrgb.1.gz

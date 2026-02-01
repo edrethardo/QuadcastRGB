@@ -1,0 +1,11 @@
+# HyperX Quadcast S (Kingston)
+SUBSYSTEM=="usb", ATTR{idVendor}=="0951", ATTR{idProduct}=="171f", MODE="0666"
+
+# HyperX Quadcast S (HP)
+SUBSYSTEM=="usb", ATTR{idVendor}=="03f0", ATTR{idProduct}=="0f8b", MODE="0666"
+SUBSYSTEM=="usb", ATTR{idVendor}=="03f0", ATTR{idProduct}=="028c", MODE="0666"
+SUBSYSTEM=="usb", ATTR{idVendor}=="03f0", ATTR{idProduct}=="048c", MODE="0666"
+SUBSYSTEM=="usb", ATTR{idVendor}=="03f0", ATTR{idProduct}=="068c", MODE="0666"
+
+# HyperX DuoCast (HP)
+SUBSYSTEM=="usb", ATTR{idVendor}=="03f0", ATTR{idProduct}=="098c", MODE="0666"
