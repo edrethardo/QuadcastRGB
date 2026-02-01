@@ -7,6 +7,9 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-deb:
     runs-on: ubuntu-latest
@@ -52,3 +55,15 @@ jobs:
       with:
         name: quadcastrgb-deb
         path: deb/*.deb
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ env.BINVER }}-${{ github.run_number }}
+        name: Release v${{ env.BINVER }}-${{ github.run_number }}
+        files: deb/*.deb
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
