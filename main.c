@@ -68,8 +68,42 @@ int main(int argc, const char **argv)
     /* Open the microphone */
     VERBOSE_PRINT(verbose, VERBOSE3_MIC);
     handle = open_micro(data_arr); /* data_arr for freeing memory */
+    
+    if (handle == NULL) {
+        /* Failed to open, likely busy. Try sending to socket. */
+        /* Note: open_micro returns NULL if busy (code 2 from claim_interface) or exits on other errors.
+           We modified open_micro to return NULL on busy. */
+        
+        if (send_packet_to_socket(data_arr, data_packet_cnt)) {
+             if(verbose) puts("Sent command to running daemon.");
+             free(data_arr);
+             /* We don't free handle since it is NULL */
+             /* We don't call LIBUSB_FREE_EVERYTHING because handle is NULL and we didn't init libusb in main explicitly (open_micro did init) 
+                Wait, open_micro calls libusb_init. If we return NULL, we should probably libusb_exit?
+                open_micro cleans up devs list. But does it libusb_exit?
+                No, open_micro in my modified version:
+                   - libusb_init
+                   - get_device_list
+                   - open ...
+                   - claim -> busy -> returns 2
+                   - back in open_micro: if 2 -> close handle -> free list -> return NULL.
+                It does NOT call libusb_exit(NULL). So we should do it or let OS handle it. 
+                Better be clean.
+             */
+             /* We can't use LIBUSB_FREE_EVERYTHING macro because it uses 'handle' which is NULL */
+             libusb_exit(NULL);
+             return 0;
+        } else {
+             fprintf(stderr, "Another program is using the microphone already, and failed to connect to daemon.\n");
+             free(data_arr);
+             libusb_exit(NULL);
+             return 2;
+        }
+    }
+
     /* Send packets */
     VERBOSE_PRINT(verbose, VERBOSE4_PKT);
+
     send_packets(handle, data_arr, data_packet_cnt, verbose);
     /* Free all memory */
     free(data_arr);

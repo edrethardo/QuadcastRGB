@@ -1,3 +1,12 @@
 temp/
 
 deps.mk # auto created by Makefile
+
+# Build artifacts
+*.o
+/quadcastrgb
+/dev
+*.deb
+*.gz
+quadcastrgb-*/
+

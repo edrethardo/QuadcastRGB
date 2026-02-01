@@ -63,7 +63,7 @@ Alternatively, it is possible to make a deb package of your own:
 git clone https://gitlab.com/Ors1mer/QuadcastRGB.git
 cd QuadcastRGB
 make debpkg # build the package with dpkg
-dpkg -i packages/deb/quadcastrgb-1.0.4-2-amd64.deb # install
+dpkg -i deb/quadcastrgb-1.0.4-2-amd64.deb # install
 ```
 
 ## RPM-based distro
@@ -158,14 +158,13 @@ If you are lucky, this should be enough:
 ```bash
 make install # linux
 gmake install OS=freebsd # freebsd
-make install OS=macos # mac
 ```
 Specify *BINDIR_INS* and *MANDIR_INS* for *make* if you want to change the
 install locations.
 
 # FAQ
 ## Problem 1: make failed
-Check the dependencies:
+Check the dependencies:  
 - gcc v12.2.0 OR clang v14.0.6 (most versions should do fine)
 - libusb-1.0 v1.0.26 or newer
 - glibc or any other standard C library
@@ -190,18 +189,18 @@ Bus 001 Device 006: ID 0951:171d Kingston Technology HyperX QuadCast S
 ```
 It must be either 0951:171f, 03f0:0f8b, 03f0:028c, 03f0:048c, 03f0:068c,
 or 03f0:098c (if it isn't, contact me, the author, I'll add support for your
-IDs).
+IDs). 
 
 Let's proceed to the rule creation:
 ```bash
 # Here the rules are stored:
-cd /etc/udev/rules.d
+cd /etc/udev/rules.d 
 # Do under superuser:
-vi 10-quadcast-perm.rules
+vi 10-quadcast-perm.rules 
 ```
 Write this line, save & exit (:wq):
 ```bash
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="<THE_VENDOR_ID>", ATTRS{idProduct}=="<THE_PRODUCT_ID>", MODE="0660", GROUP="hyperrgb"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="<THE_VENDOR_ID>", ATTRS{idProduct}=="<THE_PRODUCT_ID>", MODE="0660", GROUP="hyperrgb" 
 ```
 Now the microphone is accessible for the group "hyperrgb". Add your user to the
 group and it's done.
