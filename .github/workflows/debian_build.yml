@@ -1,0 +1,54 @@
+name: Build Debian Package
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-deb:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libusb-1.0-0-dev build-essential
+
+    - name: Get Base Version
+      id: get_version
+      run: |
+        # Extract BINVER from Makefile (e.g. "2.0.0")
+        BINVER=$(grep "^BINVER =" Makefile | cut -d "=" -f 2 | xargs)
+        echo "BINVER=$BINVER" >> $GITHUB_ENV
+        echo "Using version: $BINVER"
+
+    - name: Update Control File with Revision
+      run: |
+        # Use GITHUB_RUN_NUMBER as the Debian package revision
+        REVISION=${{ github.run_number }}
+        FULL_VERSION="${{ env.BINVER }}-${REVISION}"
+        
+        echo "Setting package version to: $FULL_VERSION"
+        
+        # Update Version line in deb/control
+        sed -i "s/^Version: .*/Version: ${FULL_VERSION}/" deb/control
+        
+        # Check content
+        cat deb/control | grep Version
+
+    - name: Build Package
+      run: |
+        REVISION=${{ github.run_number }}
+        # Pass variables to make to override defaults and match control file
+        make debpkg DEBPKGVER=$REVISION BINVER=${{ env.BINVER }}
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: quadcastrgb-deb
+        path: deb/*.deb
